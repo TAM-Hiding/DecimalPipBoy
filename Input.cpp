@@ -25,6 +25,9 @@ void inputInit()
     selectButton.begin();
     rightButton.begin();
 
+    pinMode(CONTROL_KNOB, INPUT);
+    analogReadResolution(10);
+
 #if HAS_TOUCH
     touchInit();
 #endif
@@ -98,4 +101,9 @@ bool inputSelectPressed()
 bool inputRightPressed()
 {
     return rightButton.pressed() || touchRightEvent;
+}
+
+uint16_t inputKnobValue()
+{
+    return analogRead(CONTROL_KNOB);
 }

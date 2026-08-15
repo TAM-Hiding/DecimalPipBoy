@@ -51,6 +51,20 @@
 #define BUTTON_RIGHT     2
 
 //======================================================
+// Flashlight
+// LD1500SB constant-current LED driver
+//======================================================
+
+#define FLASHLIGHT_EN    24
+
+//======================================================
+// Multifunction Analog Control
+// 10k linear potentiometer
+//======================================================
+
+#define CONTROL_KNOB     25
+
+//======================================================
 // I2C
 // Shared by GT911, BerryIMU, SHT40, and DS3231
 //======================================================
@@ -66,6 +80,8 @@
 // reconnected and individually verified.
 //======================================================
 
+#define HAS_FLASHLIGHT   1
+#define HAS_FM_RADIO     1
 #define HAS_DISPLAY      1
 #define HAS_TOUCH        1
 #define HAS_RTC          1

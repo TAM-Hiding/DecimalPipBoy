@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Arduino.h>
+
 // Initialize the three physical navigation buttons.
 void inputInit();
 
@@ -12,3 +14,7 @@ void inputUpdate();
 bool inputLeftPressed();
 bool inputSelectPressed();
 bool inputRightPressed();
+
+// Multifunction analog control.
+// Returns raw ADC position from 0 to 1023.
+uint16_t inputKnobValue();

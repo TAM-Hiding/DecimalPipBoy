@@ -5,6 +5,7 @@
 #include "Time.h"
 #include "IMU.h"
 #include "Environment.h"
+#include "Flashlight.h"
 
 #include <Arduino.h>
 
@@ -36,6 +37,7 @@ void setup()
     imuInit();
     Environment::begin();
     inputInit();
+    flashlightInit();
 
     #if HAS_TOUCH
         Serial.println("DEBUG: HAS_TOUCH is enabled.");
