@@ -16,7 +16,7 @@ static void applyOutput()
 {
     if (!currentEnabled || currentBrightness == 0)
     {
-        digitalWrite(FLASHLIGHT_EN, LOW);
+        analogWrite(FLASHLIGHT_EN, 0);
         return;
     }
 

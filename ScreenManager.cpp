@@ -4,6 +4,7 @@
 #include "Time.h"
 #include "IMU.h"
 #include "Environment.h"
+#include "FlashlightPage.h"
 
 #include <Arduino.h>
 #include <Arduino_GFX_Library.h>
@@ -29,6 +30,7 @@ enum Page
     PAGE_CLOCK,
     PAGE_COMPASS,
     PAGE_ATMOSPHERIC,
+    PAGE_FLASHLIGHT,
     PAGE_CALIBRATION,
     PAGE_SYSTEM,
     PAGE_COUNT
@@ -2420,6 +2422,26 @@ void drawCurrentPage()
             drawAtmosphericPage();
             break;
 
+        case PAGE_FLASHLIGHT:
+            displayClear();
+
+            gfx->drawRect(
+                0,
+                0,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT,
+                RGB565_WHITE
+            );
+
+            drawHeader(
+                "F L A S H L I G H T"
+            );
+
+            flashlightPageDraw();
+
+            drawFooter();
+            break;
+
         case PAGE_CALIBRATION:
             drawCalibrationPage();
             break;
@@ -2449,6 +2471,10 @@ void updateCurrentPage()
 
         case PAGE_ATMOSPHERIC:
             updateAtmosphericPage();
+            break;
+
+        case PAGE_FLASHLIGHT:
+            flashlightPageUpdate();
             break;
 
         case PAGE_CALIBRATION:
@@ -2485,6 +2511,13 @@ void previousPage()
 
 void selectCurrentPage()
 {
+    if (currentPage == PAGE_FLASHLIGHT)
+    {
+        flashlightPageSelect();
+        drawCurrentPage();
+        return;
+    }
+
     if (currentPage == PAGE_COMPASS)
     {
         compassDisplayMode =
