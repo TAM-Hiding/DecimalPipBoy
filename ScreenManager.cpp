@@ -5,6 +5,7 @@
 #include "IMU.h"
 #include "Environment.h"
 #include "FlashlightPage.h"
+#include "FMPage.h"
 
 #include <Arduino.h>
 #include <Arduino_GFX_Library.h>
@@ -31,6 +32,7 @@ enum Page
     PAGE_COMPASS,
     PAGE_ATMOSPHERIC,
     PAGE_FLASHLIGHT,
+    PAGE_FM,
     PAGE_CALIBRATION,
     PAGE_SYSTEM,
     PAGE_COUNT
@@ -2442,6 +2444,26 @@ void drawCurrentPage()
             drawFooter();
             break;
 
+        case PAGE_FM:
+            displayClear();
+
+            gfx->drawRect(
+                0,
+                0,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT,
+                RGB565_WHITE
+            );
+
+            drawHeader(
+                "F M   R A D I O"
+            );
+
+            fmPageDraw();
+
+            drawFooter();
+            break;
+
         case PAGE_CALIBRATION:
             drawCalibrationPage();
             break;
@@ -2475,6 +2497,10 @@ void updateCurrentPage()
 
         case PAGE_FLASHLIGHT:
             flashlightPageUpdate();
+            break;
+
+        case PAGE_FM:
+            fmPageUpdate();
             break;
 
         case PAGE_CALIBRATION:
@@ -2515,6 +2541,12 @@ void selectCurrentPage()
     {
         flashlightPageSelect();
         drawCurrentPage();
+        return;
+    }
+
+    if (currentPage == PAGE_FM)
+    {
+        fmPageSelect();
         return;
     }
 
