@@ -18,3 +18,10 @@ bool inputRightPressed();
 // Multifunction analog control.
 // Returns raw ADC position from 0 to 1023.
 uint16_t inputKnobValue();
+
+// Raw one-shot touchscreen press event.
+// Allows individual pages to define their own controls.
+bool inputTouchPressed();
+
+uint16_t inputTouchX();
+uint16_t inputTouchY();

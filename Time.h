@@ -20,3 +20,11 @@ uint32_t getDecimalTime();
 // Set software time from the sketch compile time.
 // Used as a fallback and to initialize an unset RTC.
 void setTimeFromCompileTime();
+
+// Format the current RTC date/time as:
+// YYYY-MM-DD HH:MM:SS
+// Returns false if RTC data is unavailable.
+bool timeGetTimestamp(
+    char* buffer,
+    size_t bufferSize
+);

@@ -5,7 +5,7 @@
 //======================================================
 
 #define OS_NAME     "STR-GZR OS"
-#define OS_VERSION  "0.3.0"
+#define OS_VERSION  "0.8.0"
 #define OS_BUILD    "Polaris"
 
 //======================================================
@@ -51,6 +51,13 @@
 #define BUTTON_RIGHT     2
 
 //======================================================
+// Haptic Feedback
+//======================================================
+
+#define HAPTIC_PIN       26
+
+
+//======================================================
 // Flashlight
 // LD1500SB constant-current LED driver
 //======================================================
@@ -88,6 +95,6 @@
 #define HAS_IMU          1
 #define HAS_ENV_SENSOR   1
 #define HAS_GEIGER       0
-#define HAS_SD           0
+#define HAS_SD           1
 #define HAS_IR           0
 #define HAS_BATTERY      0

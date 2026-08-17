@@ -1,6 +1,7 @@
 #include "ScreenManager.h"
 #include "Display.h"
 #include "Globals.h"
+#include "Input.h"
 #include "Time.h"
 #include "IMU.h"
 #include "Environment.h"
@@ -2543,6 +2544,31 @@ void selectCurrentPage()
         drawCurrentPage();
         return;
     }
+
+    //--------------------------------------------------
+    // FM page-specific touch controls
+    //--------------------------------------------------
+
+    if (
+        currentPage == PAGE_FM &&
+        inputTouchPressed()
+    )
+    {
+        if (
+            fmPageHandleTouch(
+                inputTouchX(),
+                inputTouchY()
+            )
+        )
+        {
+            return;
+        }
+    }
+
+    //--------------------------------------------------
+    // Generic FM Select
+    // Volume <-> Tuning
+    //--------------------------------------------------
 
     if (currentPage == PAGE_FM)
     {

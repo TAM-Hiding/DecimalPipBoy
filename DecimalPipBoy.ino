@@ -7,6 +7,8 @@
 #include "Environment.h"
 #include "Flashlight.h"
 #include "FMRadio.h"
+#include "Logger.h"
+#include "Haptics.h"
 
 #include <Arduino.h>
 
@@ -21,6 +23,8 @@ void setup()
 
     Serial.println();
     Serial.println("STR-GZR OS starting...");
+    
+    loggerInit();
 
     if (!displayInit())
     {
@@ -35,9 +39,13 @@ void setup()
     Serial.println("ST7796S initialized.");
 
     timeInit();
+    loggerInit();
+    loggerDumpToSerial();
+    
     imuInit();
     Environment::begin();
     inputInit();
+    hapticsInit();
     flashlightInit();
     fmRadioInit();
 
@@ -52,12 +60,14 @@ void setup()
     drawCurrentPage();
 
     lastScreenRefresh = millis();
+    
 }
 
 void loop()
 {
     inputUpdate();
     Environment::update();
+    hapticsUpdate();
 
     //--------------------------------------------------
     // Navigation

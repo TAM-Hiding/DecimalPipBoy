@@ -15,6 +15,10 @@ static bool touchLeftEvent = false;
 static bool touchSelectEvent = false;
 static bool touchRightEvent = false;
 
+static bool rawTouchEvent = false;
+static uint16_t rawTouchX = 0;
+static uint16_t rawTouchY = 0;
+
 //======================================================
 // Public functions
 //======================================================
@@ -43,6 +47,7 @@ void inputUpdate()
     touchLeftEvent = false;
     touchSelectEvent = false;
     touchRightEvent = false;
+    rawTouchEvent = false;
 
 #if HAS_TOUCH
     touchUpdate();
@@ -51,6 +56,10 @@ void inputUpdate()
     {
         const uint16_t x = touchX();
         const uint16_t y = touchY();
+        
+        rawTouchEvent = true;
+        rawTouchX = x;
+        rawTouchY = y;
 
         Serial.print("TOUCH DOWN  ");
         Serial.print(x);
@@ -106,4 +115,19 @@ bool inputRightPressed()
 uint16_t inputKnobValue()
 {
     return analogRead(CONTROL_KNOB);
+}
+
+bool inputTouchPressed()
+{
+    return rawTouchEvent;
+}
+
+uint16_t inputTouchX()
+{
+    return rawTouchX;
+}
+
+uint16_t inputTouchY()
+{
+    return rawTouchY;
 }

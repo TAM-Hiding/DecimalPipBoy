@@ -18,6 +18,7 @@ static RDA5807 radio;
 static uint16_t currentFrequency = 9990;
 static uint8_t currentVolume = 8;
 static bool currentMuted = false;
+static bool currentPowered = false;
 
 //======================================================
 // Public functions
@@ -31,8 +32,11 @@ void fmRadioInit()
     radio.setFrequency(currentFrequency);
     radio.setVolume(currentVolume);
 
-    // Start unmuted.
+    // Pip-Boy boots with FM receiver powered down.
+    radio.powerDown();
+
     currentMuted = false;
+    currentPowered = false;
 #endif
 }
 
@@ -86,4 +90,54 @@ void fmRadioToggleMute()
 bool fmRadioMuted()
 {
     return currentMuted;
+}
+
+void fmRadioPowerOn()
+{
+    if (currentPowered)
+    {
+        return;
+    }
+
+#if HAS_FM_RADIO
+    radio.powerUp();
+
+    // Restore our software-owned settings after wake.
+    radio.setFrequency(currentFrequency);
+    radio.setVolume(currentVolume);
+    radio.setMute(currentMuted);
+#endif
+
+    currentPowered = true;
+}
+
+void fmRadioPowerOff()
+{
+    if (!currentPowered)
+    {
+        return;
+    }
+
+#if HAS_FM_RADIO
+    radio.powerDown();
+#endif
+
+    currentPowered = false;
+}
+
+void fmRadioTogglePower()
+{
+    if (currentPowered)
+    {
+        fmRadioPowerOff();
+    }
+    else
+    {
+        fmRadioPowerOn();
+    }
+}
+
+bool fmRadioPowered()
+{
+    return currentPowered;
 }

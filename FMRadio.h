@@ -19,3 +19,9 @@ uint8_t fmRadioVolume();
 void fmRadioSetMuted(bool muted);
 void fmRadioToggleMute();
 bool fmRadioMuted();
+
+// Radio power control.
+void fmRadioPowerOn();
+void fmRadioPowerOff();
+void fmRadioTogglePower();
+bool fmRadioPowered();

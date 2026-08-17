@@ -233,6 +233,98 @@ static bool readRtcTime(
     return true;
 }
 
+static bool readRtcDateTime(
+    uint16_t& year,
+    uint8_t& month,
+    uint8_t& day,
+    uint8_t& hour,
+    uint8_t& minute,
+    uint8_t& second
+)
+{
+    Wire.beginTransmission(DS3231_ADDRESS);
+    Wire.write(REG_SECONDS);
+
+    if (Wire.endTransmission(false) != 0)
+    {
+        return false;
+    }
+
+    // Read:
+    // seconds, minutes, hours, day-of-week,
+    // date, month, year
+    if (Wire.requestFrom(DS3231_ADDRESS, (uint8_t)7) != 7)
+    {
+        return false;
+    }
+
+    uint8_t rawSecond = Wire.read();
+    uint8_t rawMinute = Wire.read();
+    uint8_t rawHour   = Wire.read();
+
+    // Day-of-week is currently unused.
+    Wire.read();
+
+    uint8_t rawDay   = Wire.read();
+    uint8_t rawMonth = Wire.read();
+    uint8_t rawYear  = Wire.read();
+
+    second = bcdToDecimal(rawSecond & 0x7F);
+    minute = bcdToDecimal(rawMinute & 0x7F);
+
+    // Handle either 24-hour or 12-hour mode.
+    if (rawHour & 0x40)
+    {
+        bool isPm = rawHour & 0x20;
+
+        hour = bcdToDecimal(rawHour & 0x1F);
+
+        if (hour == 12)
+        {
+            hour = 0;
+        }
+
+        if (isPm)
+        {
+            hour += 12;
+        }
+    }
+    else
+    {
+        hour = bcdToDecimal(rawHour & 0x3F);
+    }
+
+    day = bcdToDecimal(rawDay & 0x3F);
+
+    // Bit 7 is the DS3231 century bit.
+    bool century = rawMonth & 0x80;
+
+    month = bcdToDecimal(rawMonth & 0x1F);
+
+    uint8_t yearTwoDigits =
+        bcdToDecimal(rawYear);
+
+    year =
+        2000 +
+        yearTwoDigits +
+        (century ? 100 : 0);
+
+    if (
+        hour > 23 ||
+        minute > 59 ||
+        second > 59 ||
+        month < 1 ||
+        month > 12 ||
+        day < 1 ||
+        day > 31
+    )
+    {
+        return false;
+    }
+
+    return true;
+}
+
 static bool writeRtcFromCompileTime()
 {
     uint8_t hour   = compileHour();
@@ -422,4 +514,50 @@ uint32_t getDecimalTime()
         (millisecondsToday * 1000000ULL)
         / 86400000ULL
     );
+}
+
+bool timeGetTimestamp(
+    char* buffer,
+    size_t bufferSize
+)
+{
+    if (!rtcDetected || buffer == nullptr || bufferSize < 20)
+    {
+        return false;
+    }
+
+    uint16_t year = 0;
+    uint8_t month = 0;
+    uint8_t day = 0;
+    uint8_t hour = 0;
+    uint8_t minute = 0;
+    uint8_t second = 0;
+
+    if (
+        !readRtcDateTime(
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second
+        )
+    )
+    {
+        return false;
+    }
+
+    snprintf(
+        buffer,
+        bufferSize,
+        "%04u-%02u-%02u %02u:%02u:%02u",
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        second
+    );
+
+    return true;
 }
