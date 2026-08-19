@@ -23,8 +23,6 @@ void setup()
 
     Serial.println();
     Serial.println("STR-GZR OS starting...");
-    
-    loggerInit();
 
     if (!displayInit())
     {
@@ -40,7 +38,6 @@ void setup()
 
     timeInit();
     loggerInit();
-    loggerDumpToSerial();
     
     imuInit();
     Environment::begin();
