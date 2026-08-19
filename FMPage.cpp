@@ -8,6 +8,7 @@
 #include "Haptics.h"
 
 #include <Arduino.h>
+#include <EEPROM.h>
 
 //======================================================
 // Local UI constants
@@ -65,6 +66,101 @@ static uint16_t presetFrequencies[PRESET_COUNT] =
     10370,  // 103.7 MHz
     10770   // 107.7 MHz
 };
+
+constexpr uint32_t PRESET_STORAGE_MAGIC =
+    0x464D5052; // "FMPR"
+
+constexpr uint16_t PRESET_STORAGE_VERSION = 1;
+
+// IMU calibration occupies EEPROM bytes 0-31. Keep this
+// record separately aligned to leave room for that format.
+constexpr int PRESET_EEPROM_ADDRESS = 64;
+
+struct StoredPresets
+{
+    uint32_t magic;
+    uint16_t version;
+    uint16_t count;
+    uint16_t frequencies[PRESET_COUNT];
+    uint16_t checksum;
+};
+
+static uint16_t presetChecksum(const StoredPresets& data)
+{
+    uint16_t checksum = 0x5A5A;
+
+    for (uint8_t i = 0; i < PRESET_COUNT; i++)
+    {
+        checksum = static_cast<uint16_t>(
+            (checksum << 5) |
+            (checksum >> 11)
+        );
+
+        checksum ^= data.frequencies[i];
+    }
+
+    return checksum;
+}
+
+static bool presetFrequencyValid(uint16_t frequency)
+{
+    return
+        frequency >= FM_MIN &&
+        frequency <= FM_MAX &&
+        frequency % FM_STEP == 0;
+}
+
+static void savePresets()
+{
+    StoredPresets data;
+
+    data.magic = PRESET_STORAGE_MAGIC;
+    data.version = PRESET_STORAGE_VERSION;
+    data.count = PRESET_COUNT;
+
+    for (uint8_t i = 0; i < PRESET_COUNT; i++)
+    {
+        data.frequencies[i] = presetFrequencies[i];
+    }
+
+    data.checksum = presetChecksum(data);
+
+    EEPROM.put(PRESET_EEPROM_ADDRESS, data);
+
+    Serial.println("FM presets saved.");
+}
+
+static bool loadPresets()
+{
+    StoredPresets data;
+
+    EEPROM.get(PRESET_EEPROM_ADDRESS, data);
+
+    if (
+        data.magic != PRESET_STORAGE_MAGIC ||
+        data.version != PRESET_STORAGE_VERSION ||
+        data.count != PRESET_COUNT ||
+        data.checksum != presetChecksum(data)
+    )
+    {
+        return false;
+    }
+
+    for (uint8_t i = 0; i < PRESET_COUNT; i++)
+    {
+        if (!presetFrequencyValid(data.frequencies[i]))
+        {
+            return false;
+        }
+    }
+
+    for (uint8_t i = 0; i < PRESET_COUNT; i++)
+    {
+        presetFrequencies[i] = data.frequencies[i];
+    }
+
+    return true;
+}
 
 
 //======================================================
@@ -644,6 +740,8 @@ static void updatePresetPress()
         presetFrequencies[heldPreset] =
             fmRadioFrequency();
 
+        savePresets();
+
         presetSaveCompleted = true;
 
         drawPresetButtons();
@@ -695,6 +793,18 @@ static void updatePresetPress()
 //======================================================
 // Public functions
 //======================================================
+
+void fmPageInit()
+{
+    if (loadPresets())
+    {
+        Serial.println("FM presets loaded.");
+    }
+    else
+    {
+        Serial.println("Using default FM presets.");
+    }
+}
 
 void fmPageDraw()
 {

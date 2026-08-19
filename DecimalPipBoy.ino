@@ -7,6 +7,7 @@
 #include "Environment.h"
 #include "Flashlight.h"
 #include "FMRadio.h"
+#include "FMPage.h"
 #include "Logger.h"
 #include "Haptics.h"
 
@@ -44,6 +45,7 @@ void setup()
     inputInit();
     hapticsInit();
     flashlightInit();
+    fmPageInit();
     fmRadioInit();
 
     #if HAS_TOUCH

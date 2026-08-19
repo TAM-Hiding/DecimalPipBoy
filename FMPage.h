@@ -2,6 +2,9 @@
 
 #include <Arduino.h>
 
+// Load saved presets from persistent storage.
+void fmPageInit();
+
 void fmPageDraw();
 void fmPageUpdate();
 void fmPageSelect();
